@@ -1,0 +1,62 @@
+[
+  {
+    "id": "airbridgedevs",
+    "name": "AirBridge Devs",
+    "description": "Main marketing site",
+    "dbPath": "../airbridgedevs/contact_submissions.db"
+  },
+  {
+    "id": "ai-analytics-dashboards",
+    "name": "AI Analytics Dashboards",
+    "description": "Analytics dashboards landing page",
+    "dbPath": "../AI-Analytics-Dashboards/contact_submissions.db"
+  },
+  {
+    "id": "ai-integrations-deployment",
+    "name": "AI Integrations Deployment",
+    "description": "Integrations and deployment landing page",
+    "dbPath": "../AI-Integrations-Deployment/contact_submissions.db"
+  },
+  {
+    "id": "ai-powered-automation",
+    "name": "AI Powered Automation",
+    "description": "Automation landing page",
+    "dbPath": "../AI-Powered-Automation/contact_submissions.db"
+  },
+  {
+    "id": "ai-strategy-consulting",
+    "name": "AI Strategy Consulting",
+    "description": "Strategy consulting landing page",
+    "dbPath": "../AI-Strategy-Consulting/contact_submissions.db"
+  },
+  {
+    "id": "custom-software-development",
+    "name": "Custom Software Development",
+    "description": "Custom software development landing page",
+    "dbPath": "../Custom-Software-Development/contact_submissions.db"
+  },
+  {
+    "id": "generative-ai-solutions",
+    "name": "Generative AI Solutions",
+    "description": "Generative AI landing page",
+    "dbPath": "../Generative-AI-Solutions/contact_submissions.db"
+  },
+  {
+    "id": "llm-cost-optimization",
+    "name": "LLM Cost Optimization",
+    "description": "LLM cost optimization landing page",
+    "dbPath": "../LLM-caost-optimization/contact_submissions.db"
+  },
+  {
+    "id": "low-code-no-code",
+    "name": "Low Code / No Code",
+    "description": "Low-code and no-code landing page",
+    "dbPath": "../Low-Code-No-Code/contact_submissions.db"
+  },
+  {
+    "id": "airbridge-replica-project",
+    "name": "AirBridge Replica Project",
+    "description": "Replica project",
+    "dbPath": "../airbridge-replica-project/contact_submissions.db"
+  }
+]
