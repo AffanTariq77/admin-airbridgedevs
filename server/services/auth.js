@@ -7,11 +7,6 @@ const jwtExpiresIn = process.env.JWT_EXPIRES_IN || "8h";
 
 async function ensureDefaultAdmin() {
   const db = getAdminDb();
-  const row = await get(db, "SELECT COUNT(*) as count FROM users");
-  if (row?.count > 0) {
-    return;
-  }
-
   const email = process.env.ADMIN_DEFAULT_EMAIL;
   const password = process.env.ADMIN_DEFAULT_PASSWORD;
   if (!email || !password) {
@@ -19,6 +14,16 @@ async function ensureDefaultAdmin() {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
+  const existing = await get(db, "SELECT id FROM users WHERE email = ?", [email]);
+  if (existing) {
+    await run(db, "UPDATE users SET password_hash = ?, role = ? WHERE email = ?", [
+      passwordHash,
+      "admin",
+      email,
+    ]);
+    return;
+  }
+
   await run(db, "INSERT INTO users (email, password_hash, role) VALUES (?, ?, ?)", [
     email,
     passwordHash,
