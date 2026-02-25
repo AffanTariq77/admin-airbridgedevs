@@ -1,8 +1,10 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import AuthGuard from "@/components/AuthGuard";
 import Dashboard from "@/pages/Dashboard";
+import Attribution from "@/pages/Attribution";
 import Login from "@/pages/Login";
 import RepoSubmissions from "@/pages/RepoSubmissions";
+import FormSubmissions from "@/pages/FormSubmissions";
 
 export default function App() {
   return (
@@ -21,6 +23,22 @@ export default function App() {
         element={
           <AuthGuard>
             <RepoSubmissions />
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/attribution"
+        element={
+          <AuthGuard>
+            <Attribution />
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/form-submissions"
+        element={
+          <AuthGuard>
+            <FormSubmissions />
           </AuthGuard>
         }
       />
