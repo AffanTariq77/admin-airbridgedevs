@@ -17,6 +17,12 @@ export default defineConfig({
         target: "http://localhost:5050",
         changeOrigin: true,
       },
+      // So the admin panel can preview uploads through the same relative
+      // /uploads/... path that gets stored in the database
+      "/uploads": {
+        target: "http://localhost:5050",
+        changeOrigin: true,
+      },
     },
   },
 });

@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { clearToken } from "@/lib/auth";
+import { signOut } from "@/lib/auth";
 
 type LayoutProps = {
   title?: string;
@@ -11,8 +11,8 @@ export default function Layout({ title, children }: LayoutProps) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    clearToken();
-    navigate("/login");
+    signOut();
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -41,6 +41,18 @@ export default function Layout({ title, children }: LayoutProps) {
                 className="rounded-full px-3 py-1 text-slate-600 hover:bg-slate-100"
               >
                 Form Submissions
+              </Link>
+              <Link
+                to="/contact-messages"
+                className="rounded-full px-3 py-1 text-slate-600 hover:bg-slate-100"
+              >
+                Contact Messages
+              </Link>
+              <Link
+                to="/blog"
+                className="rounded-full px-3 py-1 text-slate-600 hover:bg-slate-100"
+              >
+                Blog
               </Link>
             </nav>
           </div>

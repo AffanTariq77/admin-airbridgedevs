@@ -1,20 +1,17 @@
-import { ReactNode, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { getToken } from "@/lib/auth";
+import { ReactNode } from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { isSignedIn } from "@/lib/auth";
 
 type AuthGuardProps = {
   children: ReactNode;
 };
 
 export default function AuthGuard({ children }: AuthGuardProps) {
-  const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    if (!getToken()) {
-      navigate("/login", { replace: true, state: { from: location.pathname } });
-    }
-  }, [location.pathname, navigate]);
+  if (!isSignedIn()) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
 
   return <>{children}</>;
 }

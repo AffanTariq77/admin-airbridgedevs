@@ -5,6 +5,8 @@ import Attribution from "@/pages/Attribution";
 import Login from "@/pages/Login";
 import RepoSubmissions from "@/pages/RepoSubmissions";
 import FormSubmissions from "@/pages/FormSubmissions";
+import ContactMessages from "@/pages/ContactMessages";
+import Blog from "@/pages/Blog";
 
 export default function App() {
   return (
@@ -39,6 +41,22 @@ export default function App() {
         element={
           <AuthGuard>
             <FormSubmissions />
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/contact-messages"
+        element={
+          <AuthGuard>
+            <ContactMessages />
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/blog"
+        element={
+          <AuthGuard>
+            <Blog />
           </AuthGuard>
         }
       />

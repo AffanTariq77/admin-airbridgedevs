@@ -1,0 +1,24 @@
+# Single page app routing for Apache / LiteSpeed (cPanel, Namecheap).
+#
+# Same reason as the public site: refreshing on /blog asks the server for a file
+# that does not exist, so it must be handed to index.html for React Router to
+# resolve. Real files are still served from disk.
+#
+# Vite copies everything in public/ into dist/, so this ships with the build.
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # No RewriteBase, so this also works when the panel lives in a subdirectory
+  RewriteRule . index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "index\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </FilesMatch>
+</IfModule>
