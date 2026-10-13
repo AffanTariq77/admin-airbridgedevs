@@ -39,6 +39,7 @@ export interface BlogPost {
   faqs?: BlogFaq[] | null;
   content_md?: string | null; // legacy body, no longer edited here
   cover_image_url?: string | null;
+  category_id?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -50,7 +51,65 @@ export type BlogPostInput = {
   sections?: BlogSection[];
   faqs?: BlogFaq[];
   cover_image_url?: string | null;
+  category_id?: string | null;
 };
+
+// A side tab on the public blog page. Lowest position is shown first.
+export interface BlogCategory {
+  id: string;
+  name: string;
+  slug: string;
+  position: number;
+}
+
+export async function listCategories() {
+  const { data, error } = await supabase
+    .from('blog_categories')
+    .select('*')
+    .order('position')
+    .order('created_at');
+
+  if (error) {
+    console.error('Blog categories fetch error:', error);
+    throw new Error(
+      error.code === '42P01'
+        ? 'Categories table is missing. Run supabase/blog-categories.sql in Supabase.'
+        : error.message || 'Failed to load categories'
+    );
+  }
+
+  return data as BlogCategory[];
+}
+
+export async function saveCategory(category: Omit<BlogCategory, 'id'> & { id?: string }) {
+  const { id, ...fields } = category;
+  const query = id
+    ? supabase.from('blog_categories').update(fields).eq('id', id)
+    : supabase.from('blog_categories').insert([fields]);
+
+  const { data, error } = await query.select().single();
+
+  if (error) {
+    console.error('Blog category save error:', error);
+    throw new Error(
+      error.code === '23505'
+        ? 'A category with that name already exists'
+        : error.message || 'Failed to save category'
+    );
+  }
+
+  return data as BlogCategory;
+}
+
+// Posts in it become uncategorised (ON DELETE SET NULL), they are not removed
+export async function deleteCategory(id: string) {
+  const { error } = await supabase.from('blog_categories').delete().eq('id', id);
+
+  if (error) {
+    console.error('Blog category delete error:', error);
+    throw new Error(error.message || 'Failed to delete category');
+  }
+}
 
 export const emptySection = (): BlogSection => ({
   heading: null,

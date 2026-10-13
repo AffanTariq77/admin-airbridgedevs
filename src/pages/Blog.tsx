@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Layout from "@/components/Layout";
 import ImageDropzone from "@/components/ImageDropzone";
+import CategoryManager from "@/components/CategoryManager";
+import FormatToolbar from "@/components/FormatToolbar";
 import {
   createPost,
   deletePost,
@@ -9,12 +11,14 @@ import {
   isFaqEmpty,
   isFaqIncomplete,
   isSectionEmpty,
+  listCategories,
   listPosts,
   SECTION_STYLES,
   slugify,
   updatePost,
   uploadBlogImage,
   uploadBlogImages,
+  type BlogCategory,
   type BlogFaq,
   type BlogPost,
   type BlogSection,
@@ -25,6 +29,7 @@ type FormState = {
   slug: string;
   description: string;
   cover_image_url: string;
+  category_id: string;
   sections: BlogSection[];
   faqs: BlogFaq[];
 };
@@ -34,6 +39,7 @@ const emptyForm: FormState = {
   slug: "",
   description: "",
   cover_image_url: "",
+  category_id: "",
   sections: [],
   faqs: [],
 };
@@ -44,6 +50,7 @@ const labelClass = "block text-xs font-medium uppercase tracking-wider text-slat
 
 export default function Blog() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -65,7 +72,14 @@ export default function Blog() {
       .then(setPosts)
       .catch((err) => setError(err instanceof Error ? err.message : "Failed to load posts"))
       .finally(() => setLoading(false));
+
+    listCategories()
+      .then(setCategories)
+      .catch((err) => setError(err instanceof Error ? err.message : "Failed to load categories"));
   }, []);
+
+  const categoryName = (id?: string | null) =>
+    categories.find((category) => category.id === id)?.name;
 
   const filteredPosts = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -105,6 +119,7 @@ export default function Blog() {
       slug: post.slug,
       description: post.description || "",
       cover_image_url: post.cover_image_url || "",
+      category_id: post.category_id || "",
       // Clone so edits do not mutate the row held in list state
       sections: sections.map((section) => ({
         heading: section.heading ?? null,
@@ -292,6 +307,7 @@ export default function Blog() {
       slug,
       description: form.description.trim() || null,
       cover_image_url: form.cover_image_url.trim() || null,
+      category_id: form.category_id || null,
       sections,
       faqs,
     };
@@ -378,6 +394,17 @@ export default function Blog() {
           </div>
         </div>
 
+        <CategoryManager
+          categories={categories}
+          setCategories={setCategories}
+          posts={posts}
+          onDeleted={(id) =>
+            setPosts((prev) =>
+              prev.map((post) => (post.category_id === id ? { ...post, category_id: null } : post))
+            )
+          }
+        />
+
         {/* Search */}
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <input
@@ -432,7 +459,7 @@ export default function Blog() {
                       Title
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">
-                      Slug
+                      Slug / category
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-600">
                       Sections
@@ -480,6 +507,15 @@ export default function Blog() {
                           <p className="truncate text-sm text-slate-600" title={`/${post.slug}`}>
                             /{post.slug}
                           </p>
+                          <span
+                            className={`mt-1 inline-block max-w-full truncate rounded-full px-2 py-0.5 text-xs font-medium ${
+                              categoryName(post.category_id)
+                                ? "bg-violet-100 text-violet-700"
+                                : "bg-slate-100 text-slate-500"
+                            }`}
+                          >
+                            {categoryName(post.category_id) ?? "No category"}
+                          </span>
                         </td>
                         <td className="px-4 py-3 text-sm text-slate-600">
                           {isLegacy ? (
@@ -595,6 +631,26 @@ export default function Blog() {
                   />
                   <p className="mt-1 text-xs text-slate-500">
                     Keep this short. The article itself goes in the sections below.
+                  </p>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Category</label>
+                  <select
+                    className={inputClass}
+                    value={form.category_id}
+                    onChange={(e) => setForm((prev) => ({ ...prev, category_id: e.target.value }))}
+                  >
+                    <option value="">No category (only under "All posts")</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Which side tab this post appears under on the blog page. Manage the list in
+                    Categories above.
                   </p>
                 </div>
 
@@ -727,7 +783,13 @@ export default function Blog() {
 
                           <div className="mt-3">
                             <label className={labelClass}>Description</label>
+                            <FormatToolbar
+                              textareaId={`section-description-${index}`}
+                              value={section.description || ""}
+                              onChange={(description) => patchSection(index, { description })}
+                            />
                             <textarea
+                              id={`section-description-${index}`}
                               className={`${inputClass} min-h-[140px] font-mono`}
                               value={section.description || ""}
                               onChange={(e) => patchSection(index, { description: e.target.value })}
@@ -737,7 +799,8 @@ export default function Blog() {
                             />
                             <p className="mt-1 text-xs text-slate-500">
                               Markdown works here: <code>###</code> for a smaller heading inside the
-                              section, <code>**bold**</code>, <code>*italics*</code>, <code>-</code>{" "}
+                              section, <code>**bold**</code>, <code>[coloured words](color:pink)</code>,{" "}
+                              <code>*italics*</code>, <code>•</code>{" "}
                               for bullets, <code>&gt;</code> for a quote, and pipe tables. Blank line
                               between paragraphs.
                             </p>
