@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { getFormSubmissions } from "@/lib/supabaseClient";
 
+const ALWAYS_LISTED_PLATFORMS = ["Food-Tech-Newsletter", "Food-Tech-QuoteRequest"];
+
 export default function Dashboard() {
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,8 +18,11 @@ export default function Dashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Get unique platforms
-  const platforms = Array.from(new Set(submissions.map((sub) => sub.platform))).sort();
+  // Get unique platforms. Listed ones show at 0 before their first submission,
+  // so a newly launched site doesn't look disconnected.
+  const platforms = Array.from(
+    new Set([...ALWAYS_LISTED_PLATFORMS, ...submissions.map((sub) => sub.platform)])
+  ).sort();
 
   // Filter submissions by selected platform
   const filteredSubmissions = selectedPlatform
