@@ -78,6 +78,8 @@ export default function FormSubmissions() {
       "Generative-AI-Solutions": "bg-orange-100 text-orange-800",
       "LLM-Cost-Optimization": "bg-red-100 text-red-800",
       "Low-Code-No-Code": "bg-teal-100 text-teal-800",
+      "Food-Tech-Newsletter": "bg-lime-100 text-lime-800",
+      "Food-Tech-QuoteRequest": "bg-lime-100 text-lime-800",
     };
     return colors[platform] || "bg-gray-100 text-gray-800";
   };
